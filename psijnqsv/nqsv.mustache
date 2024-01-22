@@ -1,0 +1,38 @@
+#!/bin/bash
+
+{{#job.name}}
+#PBS -N="{{.}}"
+{{/job.name}}
+
+{{#job.spec.inherit_environment}}
+#PBS -V
+{{/job.spec.inherit_environment}}
+
+{{#job.spec.attributes}}
+  {{#duration}}
+#PBS -l elapstim_req={{.}}
+  {{/duration}}
+  {{#queue_name}}
+#PBS -q {{.}}
+  {{/queue_name}}
+  {{#custom_attributes.pbs}}
+#PBS --{{key}}="{{value}}"
+  {{/custom_attributes.pbs}}
+
+{{/job.spec.attributes}}
+
+#PBS -q execque1
+#PBS -l cpunum_job=1
+#PBS -e /dev/null
+#PBS -o /dev/null
+
+{{#job.spec.directory}}
+cd "{{.}}"
+{{/job.spec.directory}}
+
+exec &>> "{{psij.script_dir}}/$PBS_JOBID.out"
+
+{{#psij.launch_command}}{{.}} {{/psij.launch_command}}
+
+{{!we redirect to a file tied to the native ID so that we can reach the file with attach().}}
+echo "$?" > "{{psij.script_dir}}/$PBS_JOBID.ec"
