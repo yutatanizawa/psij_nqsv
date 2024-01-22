@@ -11,7 +11,6 @@ job = Job(
     )
 )
 
-
 ex.submit(job)
 ex.cancel(job)
 while(True):
