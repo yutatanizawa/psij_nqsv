@@ -52,7 +52,7 @@ class NQSVJobExecutor(BatchSchedulerExecutor):
         return out.strip().split()[1] #ここでnative_idがずれていたのが原因
 
     def get_cancel_command(self, native_id: str)-> List[str]:
-        self.cancel_frag = True #qdelの完了を確認してからcancel_fragを立てるのは無理なのでは？
+        self.cancel_frag = True #qdelの完了を確認してからcancel_fragを立てるのはExecutorクラス内では無理なのでは？
         print(5)
         return ['qdel', native_id]
 
@@ -95,32 +95,6 @@ class NQSVJobExecutor(BatchSchedulerExecutor):
         
                 return r 
 
-        
-        # cols = out.split()
-
-        # if len(cols) == 2:
-        #     native_id = cols[0]
-        #     state = self._get_state(cols[1])
-        #     message = self._get_messsage    #NQSVにメッセージに該当する箇所 qstat -f の下から2行目
-
-        #     r[native_id] = JobStatus(state, message=message)
-
-        # else:
-        #     native_id = cols[2]
-        #     message = self._get_messsage
-        #     state = JobState.CANCELED
-
-        #     # if self.submit_frag and self.cancel_frag:
-        #     #     state = JobState.CANCELED
-        #     # elif self.submit_frag and not(self.cancel_frag):
-        #     #     state = JobState.COMPLETED
-        #     # else:
-        #     #     state = JobState.FAILED
-
-        #     r[native_id] = JobStatus(state, message=message)
-            
-        # return r
-    
     ### 未実装
     def _get_messsage(*args, **kwargs): #ToDo qstat -f の下2行目からメッセージを取得する関数 
         print(9)
