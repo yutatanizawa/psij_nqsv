@@ -162,6 +162,14 @@ class JobExecutor(ABC):
         pass
 
     @abstractmethod
+    def hold(self, job: Job) -> None:
+        pass
+
+    @abstractmethod
+    def release(self, job: Job) -> None:
+        pass
+
+    @abstractmethod
     def list(self) -> List[str]:
         """List native IDs of all jobs known to the backend.
 

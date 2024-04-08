@@ -1,0 +1,94 @@
+#!/bin/bash
+
+{{#job.name}}
+#SBATCH --job-name="{{.}}"
+{{/job.name}}
+
+{{#job.spec.directory}}
+#SBATCH --chdir="{{.}}"
+{{/job.spec.directory}}
+
+{{#job.spec.inherit_environment}}
+#SBATCH --export=ALL
+{{/job.spec.inherit_environment}}
+{{^job.spec.inherit_environment}}
+#SBATCH --export=NONE
+{{/job.spec.inherit_environment}}
+
+{{#job.spec.resources}}
+    {{#exclusive_node_use}}
+#SBATCH --exclusive
+    {{/exclusive_node_use}}
+
+    {{#node_count}}
+#SBATCH --nodes={{.}}
+    {{/node_count}}
+
+    {{#process_count}}
+#SBATCH --ntasks={{.}}
+    {{/process_count}}
+
+    {{#processes_per_node}}
+#SBATCH --ntasks-per-node={{.}}
+    {{/processes_per_node}}
+
+    {{#gpu_cores_per_process}}
+#SBATCH --gpus-per-task={{.}}
+    {{/gpu_cores_per_process}}
+
+    {{#cpu_cores_per_process}}
+        {{!SLURM has different meanings for 'CPU', depending on the exact allocation plugin being
+        used. The default plugin uses the literal meaning for 'CPU' - physical processor. The
+        consumable resource allocation plugin, on the other hand, equates 'CPU' to a thread (if
+        hyperthreaded CPUs are used) or CPU core (for non-hyperthreaded CPUs).}}
+#SBATCH --cpus-per-task={{.}}
+    {{/cpu_cores_per_process}}
+{{/job.spec.resources}}
+
+{{#formatted_job_duration}}
+#SBATCH --time={{.}}
+{{/formatted_job_duration}}
+
+{{#job.spec.attributes}}
+    {{#queue_name}}
+#SBATCH --partition="{{.}}"
+    {{/queue_name}}
+
+    {{#project_name}}
+#SBATCH --account="{{.}}"
+    {{/project_name}}
+
+    {{#reservation_id}}
+#SBATCH --reservation="{{.}}"
+    {{/reservation_id}}
+{{/job.spec.attributes}}
+
+{{#custom_attributes}}
+    {{#slurm}}
+#SBATCH --{{key}}="{{value}}"
+    {{/slurm}}
+{{/custom_attributes}}
+
+{{!since we redirect the output manually, below, tell slurm not to do its own thing, since it
+only results in empty files that are not cleaned up}}
+#SBATCH -e /dev/null
+#SBATCH -o /dev/null
+
+PSIJ_NODEFILE="{{psij.script_dir}}/$SLURM_JOB_ID.nodefile"
+scontrol show hostnames >"$PSIJ_NODEFILE"
+export PSIJ_NODEFILE
+
+
+{{#env}}
+#SBATCH --export={{name}}={{value}}
+{{/env}}
+
+{{!redirect output here instead of through #SBATCH directive since SLURM_JOB_ID is not available
+when the directives are evaluated; the reason for using the job id in the first place being the
+same as for the exit code file.}}
+exec &>> "{{psij.script_dir}}/$SLURM_JOB_ID.out"
+
+{{#psij.launch_command}}{{.}} {{/psij.launch_command}}
+
+{{!we redirect to a file tied to the native ID so that we can reach the file with attach().}}
+echo "$?" > "{{psij.script_dir}}/$SLURM_JOB_ID.ec"

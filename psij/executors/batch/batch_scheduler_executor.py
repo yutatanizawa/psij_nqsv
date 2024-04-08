@@ -261,6 +261,12 @@ class BatchSchedulerExecutor(JobExecutor):
                 # re-raise
                 raise
 
+    def hold(self, job: Job) -> None:
+        self._run_command(self.get_hold_command(job.native_id))
+
+    def release(self, job: Job) -> None:
+        self._run_command(self.get_release_command(job.native_id))
+
     def attach(self, job: Job, native_id: str) -> None:
         """Attaches a job to a native job.
 
@@ -359,6 +365,14 @@ class BatchSchedulerExecutor(JobExecutor):
         A list of strings representing the command and arguments to execute in order to cancel
         the job, such as, e.g., `['qdel', native_id]`.
         """
+        pass
+
+    @abstractmethod
+    def get_hold_command(self, native_id: str) -> List[str]:
+        pass
+
+    @abstractmethod
+    def get_release_command(self, native_id: str) -> List[str]:
         pass
 
     @abstractmethod

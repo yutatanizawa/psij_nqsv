@@ -2,7 +2,7 @@ from psij import Job, JobSpec, JobExecutor
 from pathlib import Path
 import time
 
-ex = JobExecutor.get_instance("nqsv")
+ex = JobExecutor.get_instance("slurm")
 job = Job(
     JobSpec(
         executable="/home/gp.sc.cc.tohoku.ac.jp/tanizawa/PSI_J/project/run.sh",
@@ -12,7 +12,4 @@ job = Job(
 )
 
 ex.submit(job)
-ex.cancel(job)
-while(True):
-    print(job.status)
-    time.sleep(0.1)
+ex.hold(job)
