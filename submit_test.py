@@ -10,6 +10,5 @@ job = Job(
         stderr_path=Path("/home/gp.sc.cc.tohoku.ac.jp/tanizawa/PSI_J/project/result/stderr.txt") 
     )
 )
-
 ex.submit(job)
 ex.hold(job)
