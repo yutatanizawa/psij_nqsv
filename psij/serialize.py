@@ -289,3 +289,17 @@ class JSONSerializer(Serializer):
         r = json.load(stream)
         assert isinstance(r, dict)
         return r
+
+class Import(Serializer):
+    def _dump_dict(self, dict: Dict[str, object], stream: IO[AnyStr]) -> None:
+        pass
+
+    def _load_dict(self, stream: IO[AnyStr]) -> Dict[str, object]:
+        pass
+
+class Export(Serializer):
+    def _dump_dict(self, dict: Dict[str, object], stream: IO[AnyStr]) -> None:
+        pass
+
+    def _load_dict(self, stream: IO[AnyStr]) -> Dict[str, object]:
+        pass
